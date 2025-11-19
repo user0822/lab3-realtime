@@ -137,7 +137,7 @@ app.use('/api/files', fileRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 
-app.get('/', (req, res) => res.send('<h1>API v3 (Real-time) Running 🚀</h1>'));
+app.get('/', (req, res) => res.redirect('/api-docs'));
 
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
