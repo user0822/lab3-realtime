@@ -16,7 +16,7 @@ model User {
   projects      Project[]
   tasks         Task[]         @relation("TaskAssignee")
   files         File[]
-  notifications Notification[] // Зв'язок зі сповіщеннями
+  notifications Notification[] 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
@@ -80,7 +80,7 @@ model Notification {
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
   isRead    Boolean  @default(false)
-  type      String   @default("INFO") // INFO, WARNING, SUCCESS
+  type      String   @default("INFO") 
   createdAt DateTime @default(now())
 
   @@index([userId]) 
