@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  password      String
+  name          String?
+  role          Role           @default(USER)
+  projects      Project[]
+  tasks         Task[]         @relation("TaskAssignee")
+  files         File[]
+  notifications Notification[] // Зв'язок зі сповіщеннями
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([email]) 
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+model File {
+  id           Int      @id @default(autoincrement())
+  filename     String
+  originalName String
+  mimetype     String
+  size         Int
+  path         String
+  uploadedBy   Int
+  user         User     @relation(fields: [uploadedBy], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  ownerId     Int
+  owner       User     @relation(fields: [ownerId], references: [id])
+  tasks       Task[]
+  createdAt   DateTime @default(now())
+
+  @@index([ownerId]) 
+}
+
+model Task {
+  id          Int        @id @default(autoincrement())
+  title       String
+  status      String     @default("TODO")
+  projectId   Int
+  project     Project    @relation(fields: [projectId], references: [id])
+  assigneeId  Int?
+  assignee    User?      @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  categories  Category[]
+  createdAt   DateTime   @default(now())
+
+  @@index([projectId]) 
+  @@index([status])   
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  tasks Task[]
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  message   String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  isRead    Boolean  @default(false)
+  type      String   @default("INFO") // INFO, WARNING, SUCCESS
+  createdAt DateTime @default(now())
+
+  @@index([userId]) 
+}
